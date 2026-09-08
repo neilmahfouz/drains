@@ -1,0 +1,9 @@
+[
+  { "file": "Dams.geojson", "label": "السدود وجسور الحماية — حدود المنشأ" },
+  { "file": "Dams_Locations.geojson", "label": "السدود وجسور الحماية — مواقع" },
+  { "file": "Industrial_Works.geojson", "label": "الأعمال الصناعية — حدود المنشأ" },
+  { "file": "Industrial_Works_Locations.geojson", "label": "الأعمال الصناعية — مواقع" },
+  { "file": "Lakes.geojson", "label": "البحيرات — حدود المسطح" },
+  { "file": "Lakes_Locations.geojson", "label": "البحيرات — مواقع" },
+  { "file": "Wadis.geojson", "label": "الأودية — كل المحافظات (623)" }
+]
