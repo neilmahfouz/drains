@@ -1174,8 +1174,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
   </div>
   <div class="grid3" style="margin-top:14px">
     <div class="card"><h3><span class="lft"><span class="ci">🧭</span>طبقات الخريطة</span></h3>
-      <label class="tgline"><span>منشآت الحماية بإحداثياتها</span><span class="tg"><input id="layerFac" type="checkbox" checked onchange="leafRefresh()"><span></span></span></label>
-      <label class="tgline"><span>نطاقات الدراسات المعتمدة</span><span class="tg"><input id="layerStudy" type="checkbox" checked onchange="leafRefresh()"><span></span></span></label>
       <div id="importedLayersList"></div>
     </div>
     <div class="card"><h3><span class="lft"><span class="ci">📥</span>استيراد نقط وبوليجونز</span></h3>
@@ -4176,7 +4174,7 @@ function initLeaf(id, opts) {
     attributionControl: true, scrollWheelZoom: !opts.simple, dragging: true
   });
   LEAF[id] = m;
-  LEAF_LAYERS[id] = { base: null, fac: L.layerGroup().addTo(m), study: L.layerGroup().addTo(m), imported: L.layerGroup().addTo(m), query: L.layerGroup().addTo(m) };
+  LEAF_LAYERS[id] = { base: null, imported: L.layerGroup().addTo(m), query: L.layerGroup().addTo(m) };
   applyBase(id, BASE_NOW);
   L.control.scale({ imperial: false, metric: true }).addTo(m);
   drawLeafLayers(id);
@@ -4224,25 +4222,7 @@ function setBase(key) {
 
 function drawLeafLayers(id) {
   var st = LEAF_LAYERS[id]; if (!st) return;
-  st.fac.clearLayers(); st.study.clearLayers();
-  var showF = !el("layerFac") || el("layerFac").checked;
-  var showS = !el("layerStudy") || el("layerStudy").checked;
   var pts = [];
-
-  if (showF) {
-    DB.facilities.forEach(function (f) {
-      if (!f.geoOk) return;
-      pts.push([f.lat, f.lon]);
-      var col = mapMode === "gov" ? govColor(f.govN) : "#2f7fea";
-      var mk = L.circleMarker([f.lat, f.lon], {
-        radius: 5, color: "#ffffff", weight: 1.2, fillColor: col, fillOpacity: 0.92
-      });
-      mk.bindPopup("<b>" + esc(f.name) + "</b><br>" + esc(f.govN) + " — " + esc(f.area || "") +
-        "<br>الحالة: " + esc(f.statusN) + "<br>السعة: " + fmt(f.capacity_km3, 1) + " ألف م³" +
-        "<br><span style=\"font-size:11px;color:#64748b\">" + f.lat.toFixed(4) + " , " + f.lon.toFixed(4) + "</span>");
-      st.fac.addLayer(mk);
-    });
-  }
   st.imported.clearLayers();
   IMPORTED_LAYERS.forEach(function (entry) {
     if (entry.visible === false) return;
@@ -4262,36 +4242,11 @@ function drawLeafLayers(id) {
     gj.addTo(st.imported);
     try { var b = gj.getBounds(); if (b.isValid()) pts.push([b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]); } catch (e) {}
   });
-  if (showS && typeof REF === "object") {
-    REF.studies.forEach(function (sd) {
-      if (sd.extent) {
-        var rect = L.rectangle([[sd.extent.s, sd.extent.w], [sd.extent.n, sd.extent.e]], {
-          color: "#e8952a", weight: 2, fillOpacity: 0.06, dashArray: "6 4"
-        });
-        rect.bindPopup("<b>نطاق " + esc(sd.wadi) + "</b><br>" + esc(sd.title) + "<br>" + esc(sd.date) +
-          "<br><span style=\"font-size:11px;color:#64748b\">الحدود المذكورة نصاً بالدراسة — ليست حدود الحوض المرسومة</span>");
-        st.study.addLayer(rect);
-        pts.push([sd.extent.s, sd.extent.w], [sd.extent.n, sd.extent.e]);
-      }
-      if (sd.lake && sd.lake.lat) {
-        var lk = L.circleMarker([sd.lake.lat, sd.lake.lon], {
-          radius: 8, color: "#ffffff", weight: 2, fillColor: "#0ea5a5", fillOpacity: 0.95
-        });
-        lk.bindPopup("<b>" + esc(sd.lake.name) + "</b><br>قاع " + sd.lake.bed + " م · مفيض " + sd.lake.crest + " م" +
-          "<br>السعة حتى المفيض: " + fmt(MWRIHydro.volAtLevel(sd.lake.curve, sd.lake.crest) / 1000, 0) + " ألف م³" +
-          "<br><span style=\"font-size:11px;color:#64748b\">إحداثيات من الرفع المساحي بالدراسة</span>");
-        st.study.addLayer(lk);
-        pts.push([sd.lake.lat, sd.lake.lon]);
-      }
-    });
-  }
   if (el("mapStats") && id === "leafMap") {
     el("mapStats").innerHTML =
-      "<div class=\"statline\"><span>منشآت بإحداثيات فعلية</span><b class=\"mono\">" + DB.facilities.filter(function (f) { return f.geoOk; }).length + "</b></div>" +
-      "<div class=\"statline\"><span>مواقع من دراسات معتمدة</span><b class=\"mono\">" + REF.studies.filter(function (s) { return s.lake; }).length + "</b></div>" +
       "<div class=\"statline\"><span>طبقات مستوردة (GeoJSON)</span><b class=\"mono\">" + IMPORTED_LAYERS.length + "</b></div>" +
       "<div class=\"statline\"><span>طبقة الأساس</span><b>" + esc((BASEMAPS[BASE_NOW] || {}).name || "—") + "</b></div>" +
-      "<div class=\"small\" style=\"margin-top:7px\">البلاطات تُجلب من الإنترنت ولا تُخزَّن فى ذاكرة التطبيق. مواقع الأودية بتيجي من طبقة Wadis المستوردة، مش من قاعدة البيانات.</div>";
+      "<div class=\"small\" style=\"margin-top:7px\">البلاطات تُجلب من الإنترنت ولا تُخزَّن فى ذاكرة التطبيق. كل الطبقات الجغرافية جايه من ملفات GeoJSON فى data/manifest.json.</div>";
   }
   return pts;
 }
@@ -4304,7 +4259,6 @@ function leafRefresh() {
 function leafFit() {
   var m = LEAF.leafMap; if (!m) { toast("الخريطة الحية غير مفعّلة"); return; }
   var b = [];
-  DB.facilities.forEach(function (f) { if (f.geoOk) b.push([f.lat, f.lon]); });
   IMPORTED_LAYERS.forEach(function (entry) {
     try { var gj = L.geoJSON(entry.data); var gb = gj.getBounds(); if (gb.isValid()) b.push([gb.getSouth(), gb.getWest()], [gb.getNorth(), gb.getEast()]); } catch (e) {}
   });
