@@ -1,9 +1,10 @@
 [
-  { "file": "Dams.geojson", "label": "السدود وجسور الحماية — حدود المنشأ" },
-  { "file": "Dams_Locations.geojson", "label": "السدود وجسور الحماية — مواقع" },
-  { "file": "Industrial_Works.geojson", "label": "الأعمال الصناعية — حدود المنشأ" },
-  { "file": "Industrial_Works_Locations.geojson", "label": "الأعمال الصناعية — مواقع" },
-  { "file": "Lakes.geojson", "label": "البحيرات — حدود المسطح" },
-  { "file": "Lakes_Locations.geojson", "label": "البحيرات — مواقع" },
-  { "file": "Wadis.geojson", "label": "الأودية — كل المحافظات (623)" }
+  { "file": "Dams.geojson", "label": "السدود وجسور الحماية — حدود المنشأ", "hasData": false },
+  { "file": "Dams_Locations_Data.geojson", "label": "السدود وجسور الحماية — بيانات تفصيلية", "hasData": true },
+  { "file": "Industrial_Work.geojson", "label": "الأعمال الصناعية — حدود المنشأ", "hasData": false },
+  { "file": "Industrial_Work_Locations_Data.geojson", "label": "الأعمال الصناعية — بيانات تفصيلية", "hasData": true },
+  { "file": "Lakes.geojson", "label": "البحيرات — حدود المسطح", "hasData": false },
+  { "file": "Lakes_Locations_Data.geojson", "label": "البحيرات — بيانات تفصيلية", "hasData": true },
+  { "file": "Studies_Locations_Data.geojson", "label": "الدراسات المعتمدة — بيانات تفصيلية", "hasData": true },
+  { "file": "Wadis.geojson", "label": "الأودية — كل المحافظات (623)", "hasData": false }
 ]
